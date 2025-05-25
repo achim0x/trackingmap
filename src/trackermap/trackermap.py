@@ -16,7 +16,7 @@ import sys
 import logging
 
 try:
-    from template_python.version import __version__, __author__, __email__, __repository__, __license__
+    from trackermap.version import __version__, __author__, __email__, __repository__, __license__
 except ModuleNotFoundError:
     # provide dummy information when not installed as package but called directly
     # also necessary to get sphinx running without error

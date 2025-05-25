@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm", "wheel", "toml"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "template_python"
+name = "trackermap"
 version = "0.1.0"
 description = "template_python"
 readme = "README.md"
@@ -30,12 +30,12 @@ test = [
 ]
 
 [project.urls]
-documentation = "https://github.com/achim0x/"
-repository = "https://github.com/achim0x/"
-tracker = "https://github.com/achim0x/"
+documentation = "https://github.com/achim0x/trackermap"
+repository = "https://github.com/achim0x/trackermap"
+tracker = "https://github.com/achim0x/trackermap"
 
 [project.scripts]
-template_python = "template_python.template_python:main"
+trackermap = "trackermap.trackermap:main"
 
 [tool.pytest.ini_options]
 pythonpath = [

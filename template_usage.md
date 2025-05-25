@@ -30,7 +30,7 @@ from <your_project_name>.version import __version__, __author__, __email__, __re
 - To install the recommended extensions if desired, use "Open Workspace from File" and open `.vscode\python.code-workspace` then you will be asked if you would like to install the recommended extensions.
 
 - For creating of new files, use the provided templates. To use them just start typing "template" in a new file and select the template you need.
-
+v
 It is recommended to use a virtual environment for each Python project e.g. Venv.
 
 - In VS-Code: `Ctrl+Shift+P` type **Python: Create Environment**: select `Venv`.

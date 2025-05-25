@@ -1,11 +1,5 @@
 # TBD Project Name
 
----
-For details how to use this template, see [template_usage](template_usage.md)
-
-Delete this section when the template is customised for a specific project
-
----
 
 [![License](https://img.shields.io/badge/license-bsd-3.svg)](https://choosealicense.com/licenses/bsd-3-clause/) [![Repo Status](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
@@ -20,15 +14,16 @@ Delete this section when the template is customised for a specific project
 
 ## Overview
 
->TODO
+This tool will connect to the The Things Network via MQTT to collect informations from connected GPS Tracker (tested with SenseCAP Tracker T1000-B).
+The latest location incl. the last way points and some addtional information will be shown on a map.
 
 ## Installation
 
 >TODO
 
 ```bash
-git clone https://github.com/achim0x/tbd.git
-cd template_python
+git clone https://github.com/achim0x/trackermap.git
+cd trackermap
 pip install .
 ```
 
