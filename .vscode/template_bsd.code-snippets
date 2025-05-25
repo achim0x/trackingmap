@@ -1,0 +1,28 @@
+{
+	"Python Template": {
+		"prefix": "template_file_python_bsd",
+		"scope": "python",
+		"isFileTemplate": true,
+		"body": [
+			"\"\"\"${1:Enter short module description here}",
+			"",
+			"${2:Enter detailed module description here}",
+			"\"\"\"",
+			"",
+			"# Copyright (c) $CURRENT_YEAR, Achim Brunner",
+			"# License: BSD 3 Clause",
+			"",
+			"# Imports **********************************************************************",
+			"",
+			"# Variables ********************************************************************",
+			"",
+			"# Classes **********************************************************************",
+			"",
+			"# Functions ********************************************************************",
+			"",
+			"# Main *************************************************************************",
+			""
+		],
+		"description": "Python Template BSD"
+	}
+}

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "wheel", "toml"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "template_python"
+version = "0.1.0"
+description = "template_python"
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Achim Brunner", email = "achim.brunner@gmx.de" }
+]
+license = {text = "BSD 3-Clause"}
+classifiers = [
+    "License :: OSI Approved :: BSD 3-Clause",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.13"
+]
+
+dependencies = [
+    "toml>=0.10.2"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest > 5.0.0",
+  "pytest-cov[all]"
+]
+
+[project.urls]
+documentation = "https://github.com/achim0x/"
+repository = "https://github.com/achim0x/"
+tracker = "https://github.com/achim0x/"
+
+[project.scripts]
+template_python = "template_python.template_python:main"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]

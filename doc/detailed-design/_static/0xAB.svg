@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="100mm"
+   height="100mm"
+   viewBox="0 0 100 100"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="0xAB.svg"
+   inkscape:export-filename="0xAB_500r.png"
+   inkscape:export-xdpi="127"
+   inkscape:export-ydpi="127"
+   inkscape:version="1.4-beta3 (01c8a1ca, 2024-08-28)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.85053022"
+     inkscape:cx="153.4337"
+     inkscape:cy="339.78805"
+     inkscape:window-width="1608"
+     inkscape:window-height="997"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <ellipse
+       style="fill:#800000;fill-opacity:1;stroke:none;stroke-width:0.442478"
+       id="Hintergrund"
+       cx="50"
+       cy="50"
+       rx="49.778999"
+       ry="49.778763" />
+    <circle
+       style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-dasharray:none"
+       id="Kontur"
+       cx="50"
+       cy="50"
+       r="45" />
+    <text
+       xml:space="preserve"
+       style="font-size:16.8138px;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5.10656;stroke-dasharray:none"
+       x="39.61734"
+       y="26.236727"
+       id="0x"><tspan
+         sodipodi:role="line"
+         id="tspan2"
+         style="stroke:none;stroke-width:5.10656"
+         x="0"
+         y="0">0x</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:47.7853px;font-family:Arial;-inkscape-font-specification:Arial;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:8.46591;stroke-dasharray:none"
+       x="14.767978"
+       y="66.059448"
+       id="AB"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-size:47.7853px;font-family:'Arial Black';-inkscape-font-specification:'Arial Black,  Heavy';stroke-width:8.46591"
+         x="14.767978"
+         y="66.059448">AB</tspan></text>
+    <circle
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1.5;stroke-dasharray:none"
+       id="Punkt_unten"
+       cx="49.108002"
+       cy="78.030396"
+       r="2.5" />
+  </g>
+</svg>
