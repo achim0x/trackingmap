@@ -113,14 +113,14 @@ def on_message(cl, userdata, msg):
 
         for measurement in payl:
             if measurement["measurementId"] == "4197":
-                tracker_info["gw-longitude"] = measurement["measurementValue"]
+                tracker_info["longitude"] = measurement["measurementValue"]
                 utc_dt = datetime.fromtimestamp(
                     int(measurement["timestamp"])/1000, tz=ZoneInfo("Europe/Berlin"))
                 tracker_info["timestamp"] = utc_dt.strftime('%Y-%m-%d %H:%M')
             if measurement["measurementId"] == "4198":
                 tracker_info["latitude"] = measurement["measurementValue"]
             if measurement["measurementId"] == "3000":
-                tracker_info["longitude"] = measurement["measurementValue"]
+                tracker_info["battery"] = measurement["measurementValue"]
         LOG.info(tracker_info)
     except (KeyError) as e:
         LOG.error("Error in message processing: %s for device: %s", e, dev)
