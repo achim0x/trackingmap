@@ -14,7 +14,7 @@
 
 ## Overview
 
-This tool will connect to the The Things Network via MQTT to collect informations from connected GPS Tracker (tested with SenseCAP Tracker T1000-B).
+This tool will connect to the The Things Network (TTN) via MQTT to collect informations from connected GPS Tracker (tested with SenseCAP Tracker T1000-B).
 The latest location incl. the last way points and some addtional information will be shown on a map.
 
 ## Installation
@@ -27,15 +27,26 @@ cd trackermap
 pip install .
 ```
 
-## Usage
-
->TODO
+create a .env file containig the credentials to access your TTN tenant with the following content:
 
 ```bash
-example [-h] [-v] {command} {command_options}
+TTN_APP_ID=my-lora-app
+TTN_TENANT=ttn
+TTN_REGION=eu1
+TTN_API_KEY=NNSXS.…
 ```
 
-Detailed descriptions of arguments
+## Usage
+
+```bash
+trackermap 
+```
+
+for mor detaild information use:
+
+```bash
+trackermap --verbose
+```
 
 ## Examples
 
