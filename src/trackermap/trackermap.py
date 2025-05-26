@@ -77,14 +77,15 @@ def on_message(cl, userdata, msg):
 
     tracker_info = {
         "tracker_id": "",
-        "longitude": 0.0,
         "latitude": 0.0,
+        "longitude": 0.0,
         "battery": 0,  # Percenc
         "timestamp": "",
         "gw-rssi": -70,    # Signalstrength in dBm
         "gw-name": "",
-        "gw-longitude": 0.0,
-        "gw-latitude": 0.0
+        "gw-latitude": 0.0,
+        "gw-longitude": 0.0
+
     }
 
     try:
