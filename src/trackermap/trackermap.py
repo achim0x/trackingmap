@@ -1,8 +1,6 @@
 """The main module with the program entry point.
 
-Enter detailed module description here
-
-Author: Name (mail)
+This modul handle the mqtt connection and uses submodules for database handling and user interface
 """
 
 # ******************************************************************************
@@ -23,6 +21,7 @@ from zoneinfo import ZoneInfo
 from datetime import datetime
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
+import trackermap.tracker_db
 
 try:
     from trackermap.version import __version__, __author__, __email__, __repository__, __license__
@@ -124,7 +123,9 @@ def on_message(cl, userdata, msg):
             if measurement["measurementId"] == "3000":
                 tracker_info["battery"] = measurement["measurementValue"]
         LOG.info(tracker_info)
-        csv_writer.writerow(tracker_info)
+        if tracker_info["latitude"] != 0.0 and tracker_info["longitude"] != 0.0:
+            trackermap.tracker_db.insert_tracker_info(db_conn, tracker_info)
+            csv_writer.writerow(tracker_info)
     except (KeyError) as e:
         LOG.error("Error in message processing: %s for device: %s", e, dev)
         LOG.debug("Payload Data: %s", data)
@@ -231,6 +232,8 @@ tracker_info = {
 }
 
 csv_writer = init_csv_writer("./tracker_data.csv", tracker_info.keys())
+
+db_conn = trackermap.tracker_db.init_db()
 
 if __name__ == "__main__":
     sys.exit(main())
