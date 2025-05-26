@@ -18,6 +18,7 @@ import os
 import argparse
 import json
 import ssl
+import csv
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from dotenv import load_dotenv
@@ -79,7 +80,7 @@ def on_message(cl, userdata, msg):
         "tracker_id": "",
         "latitude": 0.0,
         "longitude": 0.0,
-        "battery": 0,  # Percenc
+        "battery": 0,  # Percenct
         "timestamp": "",
         "gw-rssi": -70,    # Signalstrength in dBm
         "gw-name": "",
@@ -123,9 +124,31 @@ def on_message(cl, userdata, msg):
             if measurement["measurementId"] == "3000":
                 tracker_info["battery"] = measurement["measurementValue"]
         LOG.info(tracker_info)
+        csv_writer.writerow(tracker_info)
     except (KeyError) as e:
         LOG.error("Error in message processing: %s for device: %s", e, dev)
         LOG.debug("Payload Data: %s", data)
+
+
+def init_csv_writer(file_path, fieldnames):
+    """
+    Initialize CSV output of received tracker data
+
+    Args:
+        file_path (str): File name and path
+        fieldnames (dict): Dictionary with field names
+
+    Returns:
+        handle: Handler to writer object
+    """
+    file_exists = os.path.isfile(file_path)
+    file = open(file_path, mode='a', newline='', encoding='utf-8', buffering=1)
+    writer = csv.DictWriter(file, fieldnames=fieldnames)
+
+    if not file_exists:
+        writer.writeheader()
+
+    return writer
 
 
 def main() -> int:
@@ -193,6 +216,21 @@ CLIENT_ID = app_id
 USERNAME = app_id
 PASSWORD = api_key
 TOPIC = "v3/+/devices/+/up"    # all uplinks of all devices
+
+# For CSV File init only
+tracker_info = {
+    "tracker_id": "",
+    "latitude": 0.0,
+    "longitude": 0.0,
+    "battery": 0,
+    "timestamp": "",
+    "gw-rssi": -1,
+    "gw-name": "",
+    "gw-latitude": 0.0,
+    "gw-longitude": 0.0
+}
+
+csv_writer = init_csv_writer("./tracker_data.csv", tracker_info.keys())
 
 if __name__ == "__main__":
     sys.exit(main())
