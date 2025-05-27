@@ -43,7 +43,7 @@ def init_db(db_path=DB_PATH):
         cursor = conn.cursor()
 
         if not db_exists:
-            # Create table if the DB is new
+            # Create data table if the DB is new
             cursor.execute("""
                 CREATE TABLE tracker_data (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -51,11 +51,26 @@ def init_db(db_path=DB_PATH):
                     longitude REAL,
                     latitude REAL,
                     battery INTEGER,
-                    timestamp TEXT,
+                    timestamp DATETIME,
                     gw_rssi INTEGER,
                     gw_name TEXT,
                     gw_longitude REAL,
                     gw_latitude REAL
+                )
+            """)
+            conn.commit()
+
+            # Create config table if the DB is new
+            cursor.execute("""
+                CREATE TABLE tracker_config (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tracker_id TEXT,
+                    tracker_name TEXT,
+                    tracker_symbol TEXT,
+                    tracker_symbol_color TEXT,
+                    tracker_waypoint_max INTEGER,
+                    tracker_waypoint_timeout INTEGER,
+                    tracker_waypoint_color TEXT
                 )
             """)
             conn.commit()
