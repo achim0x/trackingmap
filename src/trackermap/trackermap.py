@@ -122,7 +122,8 @@ def on_message(cl, userdata, msg):
                 tracker_info["latitude"] = measurement["measurementValue"]
             if measurement["measurementId"] == "3000":
                 tracker_info["battery"] = measurement["measurementValue"]
-        LOG.info(tracker_info)
+        LOG.info("Update for %s at %s",
+                 tracker_info["tracker_id"], tracker_info["timestamp"])
         if tracker_info["latitude"] != 0.0 and tracker_info["longitude"] != 0.0:
             trackermap.tracker_db.insert_tracker_info(db_conn, tracker_info)
             csv_writer.writerow(tracker_info)
