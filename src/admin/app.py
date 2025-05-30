@@ -28,116 +28,77 @@ def get_db_connection():
 @app.route('/')
 def index():
     """Render the main HTML interface for managing tracker configuration."""
-    return render_template_string('''
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Tracker Config Editor</title>
-        <style>
-            table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
-            input { width: 100%; }
-        </style>
-    </head>
-    <body>
-        <h2>Tracker Config Editor</h2>
-        <button onclick="loadData()">Reload</button>
-        <table id="trackerTable">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Tracker ID</th>
-                    <th>Name</th>
-                    <th>Symbol</th>
-                    <th>Symbol Color</th>
-                    <th>Max Waypoints</th>
-                    <th>Timeout</th>
-                    <th>Waypoint Color</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <h3>Add New Tracker</h3>
-        <form onsubmit="addTracker(); return false;">
-            <input name="tracker_id" placeholder="Tracker ID">
-            <input name="tracker_name" placeholder="Name">
-            <input name="tracker_symbol" placeholder="Symbol">
-            <input name="tracker_symbol_color" placeholder="Symbol Color">
-            <input name="tracker_waypoint_max" type="number" placeholder="Max Waypoints">
-            <input name="tracker_waypoint_timeout" type="number" placeholder="Timeout">
-            <input name="tracker_waypoint_color" placeholder="Waypoint Color">
-            <button type="submit">Add</button>
-        </form>
-        <script>
-            async function loadData() {
-                const res = await fetch('/api/trackers');
-                const data = await res.json();
-                const tbody = document.querySelector('#trackerTable tbody');
-                tbody.innerHTML = '';
-                data.forEach(row => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${row.id}</td>
-                        <td><input value="${row.tracker_id}"/></td>
-                        <td><input value="${row.tracker_name}"/></td>
-                        <td><input value="${row.tracker_symbol}"/></td>
-                        <td><input value="${row.tracker_symbol_color}"/></td>
-                        <td><input type="number" value="${row.tracker_waypoint_max}"/></td>
-                        <td><input type="number" value="${row.tracker_waypoint_timeout}"/></td>
-                        <td><input value="${row.tracker_waypoint_color}"/></td>
-                        <td>
-                            <button onclick="updateTracker(${row.id}, this.parentElement.parentElement)">Update</button>
-                            <button onclick="deleteTracker(${row.id})">Delete</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
+    return render_template_string('''<html><body><h2>Welcome</h2><ul>
+        <li><a href="/config">Tracker Config Editor</a></li>
+        <li><a href="/data">Tracker Data Viewer</a></li>
+    </ul></body></html>''')
 
-            async function updateTracker(id, row) {
-                const inputs = row.querySelectorAll('input');
-                const body = {
-                    tracker_id: inputs[0].value,
-                    tracker_name: inputs[1].value,
-                    tracker_symbol: inputs[2].value,
-                    tracker_symbol_color: inputs[3].value,
-                    tracker_waypoint_max: parseInt(inputs[4].value),
-                    tracker_waypoint_timeout: parseInt(inputs[5].value),
-                    tracker_waypoint_color: inputs[6].value
-                };
-                await fetch(`/api/trackers/${id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                loadData();
-            }
 
-            async function deleteTracker(id) {
-                await fetch(`/api/trackers/${id}`, { method: 'DELETE' });
-                loadData();
-            }
+@app.route('/config')
+def config():
+    """Render the configuration page."""
+    return render_template_string(open('templates/config.html').read())
 
-            async function addTracker() {
-                const form = document.querySelector('form');
-                const formData = new FormData(form);
-                const body = Object.fromEntries(formData.entries());
-                body.tracker_waypoint_max = parseInt(body.tracker_waypoint_max);
-                body.tracker_waypoint_timeout = parseInt(body.tracker_waypoint_timeout);
-                await fetch('/api/trackers', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-                form.reset();
-                loadData();
-            }
 
-            loadData();
-        </script>
-    </body>
-    </html>
-    ''')
+@app.route('/data')
+def data():
+    """Render the data viewer page."""
+    try:
+        conn = get_db_connection()
+        rows = conn.execute(
+            'SELECT * FROM tracker_data ORDER BY timestamp DESC LIMIT 100').fetchall()
+        conn.close()
+        return render_template_string('''
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Tracker Data</title>
+            <style>
+                table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
+            </style>
+        </head>
+        <body>
+            <h2>Recent Tracker Data</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tracker ID</th>
+                        <th>Longitude</th>
+                        <th>Latitude</th>
+                        <th>Battery</th>
+                        <th>Timestamp</th>
+                        <th>GW RSSI</th>
+                        <th>GW Name</th>
+                        <th>GW Longitude</th>
+                        <th>GW Latitude</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>{{ row['id'] }}</td>
+                        <td>{{ row['tracker_id'] }}</td>
+                        <td>{{ row['longitude'] }}</td>
+                        <td>{{ row['latitude'] }}</td>
+                        <td>{{ row['battery'] }}</td>
+                        <td>{{ row['timestamp'] }}</td>
+                        <td>{{ row['gw_rssi'] }}</td>
+                        <td>{{ row['gw_name'] }}</td>
+                        <td>{{ row['gw_longitude'] }}</td>
+                        <td>{{ row['gw_latitude'] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </body>
+        </html>
+        ''', rows=rows)
+    except Exception as e:
+        logging.error("Error fetching tracker data: %s", e)
+        return f"<p>Error loading data: {str(e)}</p>"
+
+# Existing API routes for tracker_config
 
 
 @app.route('/api/trackers', methods=['GET'])
