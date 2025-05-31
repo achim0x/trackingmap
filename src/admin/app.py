@@ -19,13 +19,14 @@ db_path = '../../tracker_data.db'
 
 
 def get_db_connection():
-    """Establish a connection to the SQLite database."""
+    """Establish a UTF-8 compatible connection to the SQLite database."""
     if not os.path.exists(db_path):
         error_msg = f"Database file '{db_path}' does not exist."
         logging.error(error_msg)
         raise FileNotFoundError(error_msg)
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA encoding = 'UTF-8';")
     return conn
 
 
@@ -42,8 +43,8 @@ def index():
 def data():
     """Render the data viewer page with filters and pagination."""
     try:
-        tracker_id = request.args.get('tracker_id', '')
-        age_hours = request.args.get('age_hours', '')
+        tracker_id = request.args.get('tracker_id', '').strip().replace("'", "").strip()
+        age_hours = request.args.get('age_hours', '').strip().replace("'", "").strip()
         limit = int(request.args.get('limit', 50))
         offset = int(request.args.get('offset', 0))
 
@@ -77,6 +78,7 @@ def data():
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="UTF-8">
             <title>Tracker Data</title>
             <style>
                 table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
@@ -136,8 +138,8 @@ def data():
 def export_csv():
     """Export tracker data as a CSV file, with optional filters."""
     try:
-        tracker_id = request.args.get('tracker_id', '')
-        age_hours = request.args.get('age_hours', '')
+        tracker_id = request.args.get('tracker_id', '').strip()
+        age_hours = request.args.get('age_hours', '').strip()
 
         query = 'SELECT * FROM tracker_data'
         filters = []
@@ -181,7 +183,7 @@ def export_csv():
 def config():
     """Render the configuration editor page from the HTML file."""
     try:
-        with open('templates/config.html') as f:
+        with open('templates/config.html', encoding='utf-8') as f:
             html_content = f.read()
         return render_template_string(html_content)
     except FileNotFoundError:
