@@ -2,3 +2,7 @@ toml==0.10.2
 paho-mqtt 
 python-dotenv
 tzdata
+csv
+zoneinfo
+datetime
+dotenv
