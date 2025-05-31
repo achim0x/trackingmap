@@ -43,8 +43,10 @@ def index():
 def data():
     """Render the data viewer page with filters and pagination."""
     try:
-        tracker_id = request.args.get('tracker_id', '').strip().replace("'", "").strip()
-        age_hours = request.args.get('age_hours', '').strip().replace("'", "").strip()
+        tracker_id = request.args.get(
+            'tracker_id', '').strip().replace("'", "").strip()
+        age_hours = request.args.get(
+            'age_hours', '').strip().replace("'", "").strip()
         limit = int(request.args.get('limit', 50))
         offset = int(request.args.get('offset', 0))
 
@@ -74,64 +76,23 @@ def data():
         rows = conn.execute(query, params).fetchall()
         conn.close()
 
-        return render_template_string('''
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>Tracker Data</title>
-            <style>
-                table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
-            </style>
-        </head>
-        <body>
-            <h2>Tracker Data</h2>
-            <form method="get">
-                <label>Tracker ID: <input name="tracker_id" value="{{ request.args.get('tracker_id', '') }}"></label>
-                <label>Max Age (hrs): <input type="number" name="age_hours" value="{{ request.args.get('age_hours', '') }}"></label>
-                <label>Limit: <input type="number" name="limit" value="{{ request.args.get('limit', 50) }}"></label>
-                <label>Offset: <input type="number" name="offset" value="{{ request.args.get('offset', 0) }}"></label>
-                <button type="submit">Apply</button>
-                <a href="/export?tracker_id={{ request.args.get('tracker_id', '') }}&age_hours={{ request.args.get('age_hours', '') }}">Export CSV</a>
-            </form>
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Tracker ID</th>
-                        <th>Longitude</th>
-                        <th>Latitude</th>
-                        <th>Battery</th>
-                        <th>Timestamp</th>
-                        <th>GW RSSI</th>
-                        <th>GW Name</th>
-                        <th>GW Longitude</th>
-                        <th>GW Latitude</th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for row in rows %}
-                    <tr>
-                        <td>{{ row['id'] }}</td>
-                        <td>{{ row['tracker_id'] }}</td>
-                        <td>{{ row['longitude'] }}</td>
-                        <td>{{ row['latitude'] }}</td>
-                        <td>{{ row['battery'] }}</td>
-                        <td>{{ row['timestamp'] }}</td>
-                        <td>{{ row['gw_rssi'] }}</td>
-                        <td>{{ row['gw_name'] }}</td>
-                        <td>{{ row['gw_longitude'] }}</td>
-                        <td>{{ row['gw_latitude'] }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-        </body>
-        </html>
-        ''', rows=rows)
     except Exception as e:
         logging.error("Error fetching tracker data: %s", e)
         return f"<p>Error loading data: {str(e)}</p>"
+    except Exception as e:
+        logging.error("Error fetching tracker data: %s", e)
+        return f"<p>Error loading data: {str(e)}</p>"
+
+    try:
+        with open('templates/data.html', encoding='utf-8') as f:
+            html_content = f.read()
+        return render_template_string(html_content, rows=rows)
+    except FileNotFoundError:
+        logging.error("Configuration HTML file not found.")
+        return "<p>Configuration file not found.</p>", 404
+    except Exception as e:
+        logging.error("Error loading config page: %s", e)
+        return f"<p>Error loading config page: {str(e)}</p>", 500
 
 
 @app.route('/export')
