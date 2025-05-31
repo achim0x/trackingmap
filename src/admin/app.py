@@ -36,6 +36,7 @@ def index():
     return render_template_string('''<html><body><h2>Welcome</h2><ul>
         <li><a href="/config">Tracker Config Editor</a></li>
         <li><a href="/data">Tracker Data Viewer</a></li>
+        <li><a href="/tracker">Tracker Overview</a></li>
         <li><a href="/map">Map</a></li>
 
     </ul></body></html>''')
@@ -81,9 +82,6 @@ def data():
     except Exception as e:
         logging.error("Error fetching tracker data: %s", e)
         return f"<p>Error loading data: {str(e)}</p>"
-    except Exception as e:
-        logging.error("Error fetching tracker data: %s", e)
-        return f"<p>Error loading data: {str(e)}</p>"
 
     try:
         with open('templates/data.html', encoding='utf-8') as f:
@@ -95,6 +93,33 @@ def data():
     except Exception as e:
         logging.error("Error loading config page: %s", e)
         return f"<p>Error loading config page: {str(e)}</p>", 500
+
+
+@app.route('/tracker')
+def tracker():
+    """Render the tracker overview page."""
+    try:
+        query = 'SELECT * FROM tracker_data GROUP BY tracker_id'
+        query += ' ORDER BY timestamp DESC'
+
+        conn = get_db_connection()
+        rows = conn.execute(query).fetchall()
+        conn.close()
+
+    except Exception as e:
+        logging.error("Error fetching tracker overview data: %s", e)
+        return f"<p>Error loading data: {str(e)}</p>"
+
+    try:
+        with open('templates/tracker.html', encoding='utf-8') as f:
+            html_content = f.read()
+        return render_template_string(html_content, rows=rows)
+    except FileNotFoundError:
+        logging.error("tracker.html file not found.")
+        return "<p>Tracker HTML file not found.</p>", 404
+    except Exception as e:
+        logging.error("Error loading tracker overview page: %s", e)
+        return f"<p>Error loading tracker overview page: {str(e)}</p>", 500
 
 
 @app.route('/export')
