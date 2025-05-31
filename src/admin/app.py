@@ -1,8 +1,12 @@
-"""Web Application to edit tracker config"""
+"""Tracker Management Web Application """
+
 import logging
 import os
 import sqlite3
-from flask import Flask, request, jsonify, render_template_string
+import csv
+from io import StringIO
+from datetime import datetime, timedelta
+from flask import Flask, request, jsonify, render_template_string, Response
 
 
 app = Flask(__name__)
@@ -27,27 +31,48 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    """Render the main HTML interface for managing tracker configuration."""
+    """Render the main HTML interface for navigation."""
     return render_template_string('''<html><body><h2>Welcome</h2><ul>
         <li><a href="/config">Tracker Config Editor</a></li>
         <li><a href="/data">Tracker Data Viewer</a></li>
     </ul></body></html>''')
 
 
-@app.route('/config')
-def config():
-    """Render the configuration page."""
-    return render_template_string(open('templates/config.html').read())
-
-
 @app.route('/data')
 def data():
-    """Render the data viewer page."""
+    """Render the data viewer page with filters and pagination."""
     try:
+        tracker_id = request.args.get('tracker_id', '')
+        age_hours = request.args.get('age_hours', '')
+        limit = int(request.args.get('limit', 50))
+        offset = int(request.args.get('offset', 0))
+
+        query = 'SELECT * FROM tracker_data'
+        filters = []
+        params = []
+
+        if tracker_id:
+            filters.append('tracker_id = ?')
+            params.append(tracker_id)
+
+        if age_hours:
+            try:
+                age_dt = datetime.utcnow() - timedelta(hours=int(age_hours))
+                filters.append('timestamp >= ?')
+                params.append(age_dt.isoformat(sep=' '))
+            except ValueError:
+                pass
+
+        if filters:
+            query += ' WHERE ' + ' AND '.join(filters)
+
+        query += ' ORDER BY timestamp DESC LIMIT ? OFFSET ?'
+        params.extend([limit, offset])
+
         conn = get_db_connection()
-        rows = conn.execute(
-            'SELECT * FROM tracker_data ORDER BY timestamp DESC LIMIT 100').fetchall()
+        rows = conn.execute(query, params).fetchall()
         conn.close()
+
         return render_template_string('''
         <!DOCTYPE html>
         <html>
@@ -58,7 +83,15 @@ def data():
             </style>
         </head>
         <body>
-            <h2>Recent Tracker Data</h2>
+            <h2>Tracker Data</h2>
+            <form method="get">
+                <label>Tracker ID: <input name="tracker_id" value="{{ request.args.get('tracker_id', '') }}"></label>
+                <label>Max Age (hrs): <input type="number" name="age_hours" value="{{ request.args.get('age_hours', '') }}"></label>
+                <label>Limit: <input type="number" name="limit" value="{{ request.args.get('limit', 50) }}"></label>
+                <label>Offset: <input type="number" name="offset" value="{{ request.args.get('offset', 0) }}"></label>
+                <button type="submit">Apply</button>
+                <a href="/export?tracker_id={{ request.args.get('tracker_id', '') }}&age_hours={{ request.args.get('age_hours', '') }}">Export CSV</a>
+            </form>
             <table>
                 <thead>
                     <tr>
@@ -98,7 +131,65 @@ def data():
         logging.error("Error fetching tracker data: %s", e)
         return f"<p>Error loading data: {str(e)}</p>"
 
-# Existing API routes for tracker_config
+
+@app.route('/export')
+def export_csv():
+    """Export tracker data as a CSV file, with optional filters."""
+    try:
+        tracker_id = request.args.get('tracker_id', '')
+        age_hours = request.args.get('age_hours', '')
+
+        query = 'SELECT * FROM tracker_data'
+        filters = []
+        params = []
+
+        if tracker_id:
+            filters.append('tracker_id = ?')
+            params.append(tracker_id)
+
+        if age_hours:
+            try:
+                age_dt = datetime.utcnow() - timedelta(hours=int(age_hours))
+                filters.append('timestamp >= ?')
+                params.append(age_dt.isoformat(sep=' '))
+            except ValueError:
+                pass
+
+        if filters:
+            query += ' WHERE ' + ' AND '.join(filters)
+
+        query += ' ORDER BY timestamp DESC'
+
+        conn = get_db_connection()
+        rows = conn.execute(query, params).fetchall()
+        conn.close()
+
+        output = StringIO()
+        writer = csv.writer(output)
+        headers = rows[0].keys() if rows else []
+        writer.writerow(headers)
+        for row in rows:
+            writer.writerow([row[h] for h in headers])
+
+        return Response(output.getvalue(), mimetype='text/csv', headers={"Content-Disposition": "attachment;filename=tracker_data.csv"})
+    except Exception as e:
+        logging.error("Error exporting CSV: %s", e)
+        return f"<p>Error exporting data: {str(e)}</p>"
+
+
+@app.route('/config')
+def config():
+    """Render the configuration editor page from the HTML file."""
+    try:
+        with open('templates/config.html') as f:
+            html_content = f.read()
+        return render_template_string(html_content)
+    except FileNotFoundError:
+        logging.error("Configuration HTML file not found.")
+        return "<p>Configuration file not found.</p>", 404
+    except Exception as e:
+        logging.error("Error loading config page: %s", e)
+        return f"<p>Error loading config page: {str(e)}</p>", 500
 
 
 @app.route('/api/trackers', methods=['GET'])
@@ -119,17 +210,17 @@ def get_trackers():
 def add_tracker():
     """Add a new tracker configuration to the database."""
     try:
-        data = request.get_json()
+        tracker_data = request.get_json()
         conn = get_db_connection()
         conn.execute('''INSERT INTO tracker_config (tracker_id, tracker_name, tracker_symbol, tracker_symbol_color,
                         tracker_waypoint_max, tracker_waypoint_timeout, tracker_waypoint_color)
                         VALUES (?, ?, ?, ?, ?, ?, ?)''',
-                     (data['tracker_id'], data['tracker_name'], data['tracker_symbol'],
-                      data['tracker_symbol_color'], data['tracker_waypoint_max'],
-                      data['tracker_waypoint_timeout'], data['tracker_waypoint_color']))
+                     (tracker_data['tracker_id'], tracker_data['tracker_name'], tracker_data['tracker_symbol'],
+                      tracker_data['tracker_symbol_color'], tracker_data['tracker_waypoint_max'],
+                      tracker_data['tracker_waypoint_timeout'], tracker_data['tracker_waypoint_color']))
         conn.commit()
         conn.close()
-        logging.info("Added new tracker configuration: %s", data)
+        logging.info("Added new tracker configuration: %s", tracker_data)
         return '', 201
     except Exception as e:
         logging.error("Error adding tracker configuration: %s", e)
@@ -140,18 +231,18 @@ def add_tracker():
 def update_tracker(id):
     """Update an existing tracker configuration by ID."""
     try:
-        data = request.get_json()
+        tracker_data = request.get_json()
         conn = get_db_connection()
         conn.execute('''UPDATE tracker_config SET tracker_id = ?, tracker_name = ?, tracker_symbol = ?,
                         tracker_symbol_color = ?, tracker_waypoint_max = ?, tracker_waypoint_timeout = ?,
                         tracker_waypoint_color = ? WHERE id = ?''',
-                     (data['tracker_id'], data['tracker_name'], data['tracker_symbol'],
-                      data['tracker_symbol_color'], data['tracker_waypoint_max'],
-                      data['tracker_waypoint_timeout'], data['tracker_waypoint_color'], id))
+                     (tracker_data['tracker_id'], tracker_data['tracker_name'], tracker_data['tracker_symbol'],
+                      tracker_data['tracker_symbol_color'], tracker_data['tracker_waypoint_max'],
+                      tracker_data['tracker_waypoint_timeout'], tracker_data['tracker_waypoint_color'], id))
         conn.commit()
         conn.close()
         logging.info(
-            "Updated tracker configuration ID %s with data: %s", id, data)
+            "Updated tracker configuration ID %s with data: %s", id, tracker_data)
         return '', 204
     except Exception as e:
         logging.error("Error updating tracker ID %s: %s", id, e)
@@ -159,17 +250,17 @@ def update_tracker(id):
 
 
 @app.route('/api/trackers/<int:id>', methods=['DELETE'])
-def delete_tracker(id):
+def delete_tracker(tracker_id):
     """Delete a tracker configuration by ID."""
     try:
         conn = get_db_connection()
-        conn.execute('DELETE FROM tracker_config WHERE id = ?', (id,))
+        conn.execute('DELETE FROM tracker_config WHERE id = ?', (tracker_id,))
         conn.commit()
         conn.close()
-        logging.info("Deleted tracker configuration ID %s", id)
+        logging.info("Deleted tracker configuration ID %s", tracker_id)
         return '', 204
     except Exception as e:
-        logging.error("Error deleting tracker ID %s: %s", id, e)
+        logging.error("Error deleting tracker ID %s: %s", tracker_id, e)
         return jsonify({'error': str(e)}), 500
 
 
