@@ -9,11 +9,11 @@ import toml
 
 # Variables ********************************************************************
 
-__version__ = "???"
-__author__ = "???"
-__email__ = "???"
-__repository__ = "???"
-__license__ = "???"
+__version__ = "V0.1"
+__author__ = "Achim Brunner"
+__email__ = "achim.brunner@gmx.de"
+__repository__ = "https://github.com/achim0x/trackermap"
+__license__ = "BSD-3"
 
 # Classes **********************************************************************
 
@@ -41,7 +41,7 @@ def init_from_metadata():
         list: Tool related information
     """
 
-    my_metadata = meta.metadata('template_python')
+    my_metadata = meta.metadata('trackermap')
 
     return \
         my_metadata['Version'], \
