@@ -6,7 +6,7 @@ import sqlite3
 import csv
 from io import StringIO
 from datetime import datetime, timedelta
-from flask import Flask, request, jsonify, render_template_string, Response
+from flask import Flask, request, jsonify, render_template_string, render_template, Response
 
 
 app = Flask(__name__)
@@ -15,16 +15,16 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
-db_path = '../../tracker_data.db'
+DB_PATH = '../../tracker_data.db'
 
 
 def get_db_connection():
     """Establish a UTF-8 compatible connection to the SQLite database."""
-    if not os.path.exists(db_path):
-        error_msg = f"Database file '{db_path}' does not exist."
+    if not os.path.exists(DB_PATH):
+        error_msg = f"Database file '{DB_PATH}' does not exist."
         logging.error(error_msg)
         raise FileNotFoundError(error_msg)
-    conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+    conn = sqlite3.connect(DB_PATH, detect_types=sqlite3.PARSE_DECLTYPES)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA encoding = 'UTF-8';")
     return conn
@@ -36,6 +36,8 @@ def index():
     return render_template_string('''<html><body><h2>Welcome</h2><ul>
         <li><a href="/config">Tracker Config Editor</a></li>
         <li><a href="/data">Tracker Data Viewer</a></li>
+        <li><a href="/map">Map</a></li>
+
     </ul></body></html>''')
 
 
@@ -225,6 +227,27 @@ def delete_tracker(tracker_id):
     except Exception as e:
         logging.error("Error deleting tracker ID %s: %s", tracker_id, e)
         return jsonify({'error': str(e)}), 500
+
+
+@app.route("/map")
+def map():
+    return render_template("map.html")
+
+
+@app.route("/api/gps")
+def api_gps():
+    return jsonify(get_latest_gps())
+
+
+def get_latest_gps():
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT latitude, longitude, timestamp FROM tracker_data ORDER BY timestamp DESC LIMIT 10")
+    data = cursor.fetchall()
+    conn.close()
+    return [{"lat": row[0], "lng": row[1], "timestamp": row[2]} for row in data]
 
 
 if __name__ == '__main__':
