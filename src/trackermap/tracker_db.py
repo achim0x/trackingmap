@@ -20,7 +20,8 @@ tracker_info = {
     "gw-rssi": -70,
     "gw-name": "",
     "gw-longitude": 0.0,
-    "gw-latitude": 0.0
+    "gw-latitude": 0.0,
+    "gw-timestamp": ""
 }
 
 
@@ -55,7 +56,8 @@ def init_db(db_path=DB_PATH):
                     gw_rssi INTEGER,
                     gw_name TEXT,
                     gw_longitude REAL,
-                    gw_latitude REAL
+                    gw_latitude REAL,
+                    gw_timestamp DATETIME
                 )
             """)
             conn.commit()
@@ -89,15 +91,16 @@ def insert_tracker_info(conn, data):
         conn (sqlite3.Connection): An active SQLite connection.
         data (dict): A dictionary containing tracker info with keys:
             'tracker_id', 'latitude', 'longitude', 'battery',
-            'timestamp', 'gw-rssi', 'gw-name', 'gw-latitude', 'gw-longitude'
+            'timestamp', 'gw-rssi', 'gw-name', 'gw-latitude', 'gw-longitude', 'gw-timestamp'
     """
+    print(data)
     try:
         cursor = conn.cursor()
         cursor.execute("""
             INSERT INTO tracker_data (
                 tracker_id, latitude, longitude, battery, timestamp,
-                gw_rssi, gw_name, gw_latitude, gw_longitude
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                gw_rssi, gw_name, gw_latitude, gw_longitude, gw_timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             data["tracker_id"],
             data["latitude"],
@@ -107,7 +110,8 @@ def insert_tracker_info(conn, data):
             data["gw-rssi"],
             data["gw-name"],
             data["gw-latitude"],
-            data["gw-longitude"]
+            data["gw-longitude"],
+            data["gw-timestamp"]
         ))
         conn.commit()
     except sqlite3.Error as e:

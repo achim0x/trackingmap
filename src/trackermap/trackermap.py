@@ -18,7 +18,7 @@ import json
 import ssl
 import csv
 from zoneinfo import ZoneInfo
-from datetime import datetime
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
 import trackermap.tracker_db
@@ -84,7 +84,9 @@ def on_message(cl, userdata, msg):
         "gw-rssi": -70,    # Signalstrength in dBm
         "gw-name": "",
         "gw-latitude": 0.0,
-        "gw-longitude": 0.0
+        "gw-longitude": 0.0,
+        "gw-timestamp": ""
+
 
     }
 
@@ -111,13 +113,16 @@ def on_message(cl, userdata, msg):
         tracker_info["gw-rssi"] = rx_metadata["rssi"]
         tracker_info["gw-latitude"] = rx_metadata["location"]["latitude"]
         tracker_info["gw-longitude"] = rx_metadata["location"]["longitude"]
+        timestamp_str = rx_metadata["time"]
+        tracker_info["gw-timestamp"] = (datetime.fromisoformat(timestamp_str.replace("Z",
+                                        "+00:00")) + timedelta(hours=2)).strftime("%Y-%m-%d %H:%M:%S")
 
         for measurement in payl:
             if measurement["measurementId"] == "4197":
                 tracker_info["longitude"] = measurement["measurementValue"]
                 utc_dt = datetime.fromtimestamp(
                     int(measurement["timestamp"])/1000, tz=ZoneInfo("Europe/Berlin"))
-                tracker_info["timestamp"] = utc_dt.strftime('%Y-%m-%d %H:%M')
+                tracker_info["timestamp"] = utc_dt.strftime('%Y-%m-%d %H:%M:%S')
             if measurement["measurementId"] == "4198":
                 tracker_info["latitude"] = measurement["measurementValue"]
             if measurement["measurementId"] == "3000":
@@ -229,7 +234,8 @@ tracker_info = {
     "gw-rssi": -1,
     "gw-name": "",
     "gw-latitude": 0.0,
-    "gw-longitude": 0.0
+    "gw-longitude": 0.0,
+    "gw-timestamp": ""
 }
 
 csv_writer = init_csv_writer("./tracker_data.csv", tracker_info.keys())
