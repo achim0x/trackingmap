@@ -21,10 +21,10 @@ from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import paho.mqtt.client as mqtt
-import trackermap.tracker_db
+import trackingmap_agent.tracker_db
 
 try:
-    from trackermap.version import __version__, __author__, __email__, __repository__, __license__
+    from trackingmap_agent.version import __version__, __author__, __email__, __repository__, __license__
 except ModuleNotFoundError:
     # provide dummy information when not installed as package but called directly
     # also necessary to get sphinx running without error
@@ -130,7 +130,7 @@ def on_message(cl, userdata, msg):
         LOG.info("Update for %s at %s",
                  tracker_info["tracker_id"], tracker_info["timestamp"])
         if tracker_info["latitude"] != 0.0 and tracker_info["longitude"] != 0.0:
-            trackermap.tracker_db.insert_tracker_info(db_conn, tracker_info)
+            trackingmap_agent.tracker_db.insert_tracker_info(db_conn, tracker_info)
             csv_writer.writerow(tracker_info)
     except (KeyError) as e:
         LOG.error("Error in message processing: %s for device: %s", e, dev)
@@ -240,7 +240,7 @@ tracker_info = {
 
 csv_writer = init_csv_writer("./tracker_data.csv", tracker_info.keys())
 
-db_conn = trackermap.tracker_db.init_db()
+db_conn = trackingmap_agent.tracker_db.init_db()
 
 if __name__ == "__main__":
     sys.exit(main())

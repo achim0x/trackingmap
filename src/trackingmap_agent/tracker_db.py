@@ -93,7 +93,7 @@ def insert_tracker_info(conn, data):
             'tracker_id', 'latitude', 'longitude', 'battery',
             'timestamp', 'gw-rssi', 'gw-name', 'gw-latitude', 'gw-longitude', 'gw-timestamp'
     """
-    print(data)
+
     try:
         cursor = conn.cursor()
         cursor.execute("""

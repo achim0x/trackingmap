@@ -3,9 +3,9 @@ requires = ["setuptools", "setuptools-scm", "wheel", "toml"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "trackermap"
-version = "0.1.1"
-description = "template_python"
+name = "trackingmap-agent"
+version = "0.2.0"
+description = "Collecting Lora GPS Trackerr information in a database"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
@@ -35,7 +35,7 @@ repository = "https://github.com/achim0x/trackermap"
 tracker = "https://github.com/achim0x/trackermap"
 
 [project.scripts]
-trackermap = "trackermap.trackermap:main"
+trackingmap-agent = "trackingmap_agent.trackingmap_agent:main"
 
 [tool.pytest.ini_options]
 pythonpath = [

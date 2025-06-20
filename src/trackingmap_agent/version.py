@@ -9,7 +9,7 @@ import toml
 
 # Variables ********************************************************************
 
-__version__ = "V0.1"
+__version__ = "V0.2.0"
 __author__ = "Achim Brunner"
 __email__ = "achim.brunner@gmx.de"
 __repository__ = "https://github.com/achim0x/trackermap"

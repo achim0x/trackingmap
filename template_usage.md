@@ -99,7 +99,7 @@ It is possible to create an executable file that contains the package and all it
 Run the following command in the root folder:
 
 ```cmd
-pyinstaller --noconfirm --onefile --console --name "template_python" --add-data "./pyproject.toml;."  "./src/template_python/templaty_python.py"
+pyinstaller --noconfirm --onefile --console --name "trackingmap-agent" --add-data "./pyproject.toml;."  "./src/trackingmap_agent/trackingmap_agent.py"
 ```
 
 ## Folder Structure
